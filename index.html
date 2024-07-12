@@ -95,6 +95,7 @@
                 <option value="easy">Easy</option>
                 <option value="medium">Medium</option>
                 <option value="hard">Hard</option>
+                <option value="impossible">Impossible</option>
             </select>
         </div>
     </div>
@@ -108,18 +109,18 @@
         const tasks = [
             { task: "Go outside", difficulty: "easy" },
             { task: "Do 10 jumping jacks", difficulty: "easy" },
-            { task: "Find someone named Joe", difficulty: "easy" },
+            { task: "Find someone named Joe", difficulty: "medium" },
             { task: "Buy a pack of gum", difficulty: "easy" },
             { task: "Ask a stranger for directions", difficulty: "easy" },
             { task: "Visit a new coffee shop", difficulty: "medium" },
-            { task: "Learn how to say 'hello' in five different languages", difficulty: "medium" },
+            { task: "Learn how to say 'hello' in five different languages", difficulty: "hard" },
             { task: "Compliment a stranger", difficulty: "easy" },
-            { task: "Take a selfie with a statue", difficulty: "easy" },
-            { task: "Find a red car and take a picture of it", difficulty: "medium" },
+            { task: "Take a selfie with a statue", difficulty: "medium" },
+            { task: "Find a red car and take a picture of it", difficulty: "easy" },
             { task: "Write a letter to your local representative", difficulty: "hard" },
-            { task: "Donate to a charity", difficulty: "easy" },
+            { task: "Donate to a charity", difficulty: "medium" },
             { task: "Leave a positive review for a local business", difficulty: "easy" },
-            { task: "Try a new dish at a restaurant", difficulty: "easy" },
+            { task: "Try a new dish at a restaurant", difficulty: "medium" },
             { task: "Take a photo of a beautiful sunset", difficulty: "easy" },
             { task: "Give a flower to someone", difficulty: "easy" },
             { task: "Attend a local event", difficulty: "medium" },
@@ -127,15 +128,15 @@
             { task: "Try a new workout class", difficulty: "medium" },
             { task: "Find a four-leaf clover", difficulty: "hard" },
             { task: "Start a conversation with a stranger", difficulty: "medium" },
-            { task: "Visit a nearby town", difficulty: "medium" },
-            { task: "Send a postcard to a friend", difficulty: "easy" },
+            { task: "Visit a nearby town", difficulty: "hard" },
+            { task: "Send a postcard to a friend", difficulty: "medium" },
             { task: "Take a photo with a street performer", difficulty: "easy" },
             { task: "Buy a local newspaper and read it", difficulty: "easy" },
             { task: "Find a new hiking trail", difficulty: "medium" },
             { task: "Ask a stranger about their day", difficulty: "medium" },
             { task: "Visit a local museum", difficulty: "medium" },
             { task: "Try a new ice cream flavor", difficulty: "easy" },
-            { task: "Find a street with your name", difficulty: "medium" },
+            { task: "Find a street with your name", difficulty: "hard" },
             { task: "Visit a bookstore and buy a book", difficulty: "easy" },
             { task: "Give a small gift to someone", difficulty: "easy" },
             { task: "Find a local landmark and take a photo", difficulty: "medium" },
@@ -270,7 +271,11 @@
             { task: "Get a new job", difficulty: "hard" },
             { task: "Move to a new city", difficulty: "hard" },
             { task: "Learn to play a musical instrument", difficulty: "hard" },
-            { task: "Join a sports team", difficulty: "hard" }
+            { task: "Join a sports team", difficulty: "hard" },
+            { task: "Find an abandoned building", difficulty: "medium" },
+            { task: "Explore an abandoned location", difficulty: "hard" },
+            { task: "Have a romantic sunset with somone you love", difficulty: "hard" },
+            { task: "Find find true love", difficulty: "impossible" },
         ];
 
         function generateTask() {
