@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Task Generator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3em;
+            margin-bottom: 0.5em;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        button, select {
+            font-size: 1.5em;
+            padding: 0.5em 1.5em;
+            margin-bottom: 1em;
+            background-color: #fff;
+            color: #ff7e5f;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        button:hover, select:hover {
+            background-color: #ff7e5f;
+            color: #fff;
+        }
+        #taskDisplay {
+            font-size: 2em;
+            padding: 0 1em;
+            color: white;
+            max-width: 80%;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+            display: inline-block;
+        }
+        .container {
+            text-align: center;
+        }
+        .settings {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .settings-menu {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 10px;
+            background: #fff;
+            padding: 1em;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .settings-menu.show {
+            display: block;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5em;
+        }
+        .credit {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 1em;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="credit">Made by @HarshHelium</div>
+    <div class="settings">
+        <button onclick="toggleSettings()">Settings</button>
+        <div class="settings-menu" id="settingsMenu">
+            <label for="colorPicker">Choose Background Color:</label>
+            <input type="color" id="colorPicker" value="#ff7e5f">
+            <label for="taskFilter">Choose Task Difficulty:</label>
+            <select id="taskFilter">
+                <option value="all">All</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+        </div>
+    </div>
+    <div class="container">
+        <h1>Random Task Generator</h1>
+        <button onclick="generateTask()">Get a Random Task</button>
+        <p id="taskDisplay"></p>
+    </div>
+
+    <script>
+        const tasks = [
+            { task: "Go outside", difficulty: "easy" },
+            { task: "Do 10 jumping jacks", difficulty: "easy" },
+            { task: "Find someone named Joe", difficulty: "easy" },
+            { task: "Buy a pack of gum", difficulty: "easy" },
+            { task: "Ask a stranger for directions", difficulty: "easy" },
+            { task: "Visit a new coffee shop", difficulty: "medium" },
+            { task: "Learn how to say 'hello' in five different languages", difficulty: "medium" },
+            { task: "Compliment a stranger", difficulty: "easy" },
+            { task: "Take a selfie with a statue", difficulty: "easy" },
+            { task: "Find a red car and take a picture of it", difficulty: "medium" },
+            { task: "Write a letter to your local representative", difficulty: "hard" },
+            { task: "Donate to a charity", difficulty: "easy" },
+            { task: "Leave a positive review for a local business", difficulty: "easy" },
+            { task: "Try a new dish at a restaurant", difficulty: "easy" },
+            { task: "Take a photo of a beautiful sunset", difficulty: "easy" },
+            { task: "Give a flower to someone", difficulty: "easy" },
+            { task: "Attend a local event", difficulty: "medium" },
+            { task: "Go to a park and read a book", difficulty: "easy" },
+            { task: "Try a new workout class", difficulty: "medium" },
+            { task: "Find a four-leaf clover", difficulty: "hard" },
+            { task: "Start a conversation with a stranger", difficulty: "medium" },
+            { task: "Visit a nearby town", difficulty: "medium" },
+            { task: "Send a postcard to a friend", difficulty: "easy" },
+            { task: "Take a photo with a street performer", difficulty: "easy" },
+            { task: "Buy a local newspaper and read it", difficulty: "easy" },
+            { task: "Find a new hiking trail", difficulty: "medium" },
+            { task: "Ask a stranger about their day", difficulty: "medium" },
+            { task: "Visit a local museum", difficulty: "medium" },
+            { task: "Try a new ice cream flavor", difficulty: "easy" },
+            { task: "Find a street with your name", difficulty: "medium" },
+            { task: "Visit a bookstore and buy a book", difficulty: "easy" },
+            { task: "Give a small gift to someone", difficulty: "easy" },
+            { task: "Find a local landmark and take a photo", difficulty: "medium" },
+            { task: "Try a new type of tea", difficulty: "easy" },
+            { task: "Ask someone about their favorite book", difficulty: "easy" },
+            { task: "Visit a farmer's market", difficulty: "easy" },
+            { task: "Find a piece of street art and take a photo", difficulty: "medium" },
+            { task: "Buy a plant and take care of it", difficulty: "medium" },
+            { task: "Give someone a hug", difficulty: "easy" },
+            { task: "Write a thank-you note to someone", difficulty: "easy" },
+            { task: "Find a local library and borrow a book", difficulty: "medium" },
+            { task: "Learn about a local historical figure", difficulty: "medium" },
+            { task: "Visit a local art gallery", difficulty: "medium" },
+            { task: "Take a day trip to a nearby city", difficulty: "medium" },
+            { task: "Find a dog and pet it", difficulty: "easy" },
+            { task: "Try a new type of cuisine", difficulty: "easy" },
+            { task: "Ask someone about their favorite movie", difficulty: "easy" },
+            { task: "Find a bakery and try a pastry", difficulty: "easy" },
+            { task: "Take a walk and collect interesting rocks", difficulty: "easy" },
+            { task: "Join a local club or group", difficulty: "medium" },
+            { task: "Go to a flea market", difficulty: "medium" },
+            { task: "Ask a friend to tell you a joke", difficulty: "easy" },
+            { task: "Take a photo with a police officer", difficulty: "medium" },
+            { task: "Visit a local farm", difficulty: "medium" },
+            { task: "Find a place with a beautiful view", difficulty: "medium" },
+            { task: "Attend a local sports game", difficulty: "medium" },
+            { task: "Find a new podcast to listen to", difficulty: "easy" },
+            { task: "Take a different route to work or school", difficulty: "easy" },
+            { task: "Make a new friend", difficulty: "hard" },
+            { task: "Visit a local zoo or aquarium", difficulty: "medium" },
+            { task: "Learn about the history of your town", difficulty: "medium" },
+            { task: "Try a new hairstyle", difficulty: "medium" },
+            { task: "Find a local craft fair", difficulty: "medium" },
+            { task: "Take a cooking class", difficulty: "hard" },
+            { task: "Find a hidden gem in your city", difficulty: "hard" },
+            { task: "Ask someone about their favorite holiday", difficulty: "easy" },
+            { task: "Take a photo with a firefighter", difficulty: "medium" },
+            { task: "Go to a local brewery or winery", difficulty: "medium" },
+            { task: "Find a new local bakery", difficulty: "easy" },
+            { task: "Take a photo with a stranger", difficulty: "hard" },
+            { task: "Write a letter to your favorite author", difficulty: "medium" },
+            { task: "Visit a new city", difficulty: "hard" },
+            { task: "Try a new kind of dessert", difficulty: "easy" },
+            { task: "Ask someone about their favorite vacation spot", difficulty: "easy" },
+            { task: "Take a photo with a street performer", difficulty: "easy" },
+            { task: "Go to a local concert", difficulty: "medium" },
+            { task: "Find a new local restaurant", difficulty: "medium" },
+            { task: "Take a photo with a police officer", difficulty: "medium" },
+            { task: "Buy a ticket to a local museum", difficulty: "medium" },
+            { task: "Visit a new town", difficulty: "medium" },
+            { task: "Try a new type of coffee", difficulty: "easy" },
+            { task: "Ask someone about their favorite TV show", difficulty: "easy" },
+            { task: "Take a photo with a street sign", difficulty: "easy" },
+            { task: "Visit a local temple", difficulty: "medium" },
+            { task: "Take a painting class", difficulty: "hard" },
+            { task: "Find a new local cafe", difficulty: "easy" },
+            { task: "Go to a local art fair", difficulty: "medium" },
+            { task: "Ask someone about their favorite food", difficulty: "easy" },
+            { task: "Take a photo with a dog", difficulty: "easy" },
+            { task: "Write a letter to your favorite musician", difficulty: "medium" },
+            { task: "Visit a new park", difficulty: "easy" },
+            { task: "Try a new kind of fruit", difficulty: "easy" },
+            { task: "Ask someone about their favorite game", difficulty: "easy" },
+            { task: "Take a photo with a street performer", difficulty: "easy" },
+            { task: "Go to a local sports game", difficulty: "medium" },
+            { task: "Find a new local bar", difficulty: "medium" },
+            { task: "Take a photo with a firefighter", difficulty: "medium" },
+            { task: "Buy a ticket to a local play", difficulty: "medium" },
+            { task: "Visit a new museum", difficulty: "medium" },
+            { task: "Try a new kind of tea", difficulty: "easy" },
+            { task: "Ask someone about their favorite childhood memory", difficulty: "easy" },
+            { task: "Take a photo with a street sign", difficulty: "easy" },
+            { task: "Visit a local mosque", difficulty: "medium" },
+            { task: "Take a sculpting class", difficulty: "hard" },
+            { task: "Find a new local deli", difficulty: "easy" },
+            { task: "Go to a local farmers market", difficulty: "easy" },
+            { task: "Ask someone about their favorite hobby", difficulty: "easy" },
+            { task: "Take a photo with a cat", difficulty: "easy" },
+            { task: "Write a letter to your favorite actor", difficulty: "medium" },
+            { task: "Visit a new neighborhood", difficulty: "medium" },
+            { task: "Try a new kind of soup", difficulty: "easy" },
+            { task: "Ask someone about their favorite dessert", difficulty: "easy" },
+            { task: "Take a photo with a stranger", difficulty: "hard" },
+            { task: "Go to a local sports event", difficulty: "medium" },
+            { task: "Find a new local cafe", difficulty: "easy" },
+            { task: "Take a photo with a street performer", difficulty: "easy" },
+            { task: "Buy a ticket to a local theater show", difficulty: "medium" },
+            { task: "Visit a new library", difficulty: "medium" },
+            { task: "Try a new kind of sandwich", difficulty: "easy" },
+            { task: "Ask someone about their favorite season", difficulty: "easy" },
+            { task: "Take a photo with a street sign", difficulty: "easy" },
+            { task: "Visit a local mosque", difficulty: "medium" },
+            { task: "Take a painting class", difficulty: "hard" },
+            { task: "Find a new local shop", difficulty: "easy" },
+            { task: "Go to a local craft fair", difficulty: "medium" },
+            { task: "Ask someone about their favorite place to travel", difficulty: "easy" },
+            { task: "Take a photo with a dog", difficulty: "easy" },
+            { task: "Write a letter to your favorite musician", difficulty: "medium" },
+            { task: "Visit a new park", difficulty: "easy" },
+            { task: "Try a new kind of pastry", difficulty: "easy" },
+            { task: "Ask someone about their favorite hobby", difficulty: "easy" },
+            { task: "Take a photo with a street performer", difficulty: "easy" },
+            { task: "Go to a local theater performance", difficulty: "medium" },
+            { task: "Find a new local cafe", difficulty: "easy" },
+            { task: "Take a photo with a firefighter", difficulty: "medium" },
+            { task: "Buy a ticket to a local concert", difficulty: "medium" },
+            { task: "Visit a new museum", difficulty: "medium" },
+            { task: "Try a new kind of drink", difficulty: "easy" },
+            { task: "Ask someone about their favorite childhood memory", difficulty: "easy" },
+            { task: "Take a photo with a street sign", difficulty: "easy" },
+            { task: "Visit a local mosque", difficulty: "medium" },
+            { task: "Take a pottery class", difficulty: "medium" },
+            { task: "Find a new local market", difficulty: "easy" },
+            { task: "Go to a local farmers market", difficulty: "easy" },
+            { task: "Ask someone about their favorite holiday", difficulty: "easy" },
+            { task: "Take a photo with a cat", difficulty: "easy" },
+            { task: "Play Minecraft", difficulty: "easy" },
+            { task: "Play Among Us", difficulty: "easy" },
+            { task: "Watch a movie", difficulty: "easy" },
+            { task: "Watch 'Inception'", difficulty: "easy" },
+            { task: "Watch 'The Matrix'", difficulty: "easy" },
+            { task: "Watch a TV show", difficulty: "easy" },
+            { task: "Watch 'Friends'", difficulty: "easy" },
+            { task: "Watch 'Breaking Bad'", difficulty: "easy" },
+            { task: "Watch 'Stranger Things'", difficulty: "easy" },
+            { task: "Visit a theme park", difficulty: "hard" },
+            { task: "Learn a new language", difficulty: "hard" },
+            { task: "Run a marathon", difficulty: "hard" },
+            { task: "Write a book", difficulty: "hard" },
+            { task: "Start a YouTube channel", difficulty: "hard" },
+            { task: "Go on a vacation", difficulty: "hard" },
+            { task: "Get a new job", difficulty: "hard" },
+            { task: "Move to a new city", difficulty: "hard" },
+            { task: "Learn to play a musical instrument", difficulty: "hard" },
+            { task: "Join a sports team", difficulty: "hard" }
+        ];
+
+        function generateTask() {
+            const taskFilter = document.getElementById('taskFilter').value;
+            let filteredTasks = tasks;
+
+            if (taskFilter !== 'all') {
+                filteredTasks = tasks.filter(task => task.difficulty === taskFilter);
+            }
+
+            const randomIndex = Math.floor(Math.random() * filteredTasks.length);
+            const task = filteredTasks[randomIndex].task;
+
+            // Split the task into words and find the center word
+            const words = task.split(' ');
+            const centerIndex = Math.floor(words.length / 2);
+
+            // Join the words and center them
+            const centeredTask = words.map((word, index) => {
+                if (index === centerIndex) {
+                    return `<span style="display: inline-block;">${word}</span>`;
+                }
+                return word;
+            }).join(' ');
+
+            document.getElementById('taskDisplay').innerHTML = centeredTask;
+        }
+
+        function toggleSettings() {
+            const settingsMenu = document.getElementById('settingsMenu');
+            settingsMenu.classList.toggle('show');
+        }
+
+        document.getElementById('colorPicker').addEventListener('input', function() {
+            const color = this.value;
+            document.body.style.background = `linear-gradient(to right, ${color}, #feb47b)`;
+        });
+    </script>
+</body>
+</html>
