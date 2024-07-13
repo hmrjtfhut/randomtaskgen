@@ -41,13 +41,12 @@
             color: #fff;
         }
         #taskDisplay {
-            font-size: 2em;
+            font-size: 1.5em;
             padding: 0 1em;
             color: white;
             max-width: 80%;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-            display: inline-block;
-            margin-top: 1em;
+            margin-top: 0.5em;
         }
         .container {
             text-align: center;
@@ -113,18 +112,16 @@
                 <option value="hard">Hard</option>
                 <option value="impossible">Impossible</option>
             </select>
-            <label for="musicVolume">Music Volume:</label>
-            <input type="range" id="musicVolume" min="0" max="1" step="0.1" value="0.2" onchange="setVolume(this.value)">
         </div>
     </div>
     <div class="container">
         <h1>Random Task Generator</h1>
-        <button onclick="generateTask()">Get a Random Task</button>
-        <button id="completeTaskBtn" onclick="completeTask()" style="display:none;" disabled>Complete Task</button>
-        <p id="taskDisplay"></p>
+        <button id="getTaskButton" onclick="generateTask()">Get a Random Task</button>
+        <button id="completeTaskButton" onclick="completeTask()" style="display:none;">Complete Task</button>
         <div class="points" id="pointsDisplay">Points: 0</div>
+        <p id="taskDisplay"></p>
     </div>
-    <audio id="backgroundMusic" loop>
+    <audio id="backgroundMusic" loop autoplay>
         <source src="your-music-file.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
@@ -303,84 +300,183 @@
             { task: "Find find true love", difficulty: "impossible" }
         ];
 
-        const music = document.getElementById('backgroundMusic');
-        music.volume = 0.2;
+        let points = 0;
+        let currentTask = null;
+        let timer = null;
 
-        function toggleSettings() {
-            const menu = document.getElementById('settingsMenu');
-            menu.classList.toggle('show');
-        }
-
-        function setVolume(value) {
-            music.volume = value;
-        }
+        const getTaskButton = document.getElementById('getTaskButton');
+        const completeTaskButton = document.getElementById('completeTaskButton');
+        const taskDisplay = document.getElementById('taskDisplay');
+        const pointsDisplay = document.getElementById('pointsDisplay');
+        const colorPicker = document.getElementById('colorPicker');
+        const taskFilter = document.getElementById('taskFilter');
 
         function generateTask() {
-            const taskDisplay = document.getElementById('taskDisplay');
-            const taskFilter = document.getElementById('taskFilter').value;
-            let filteredTasks = tasks;
-            if (taskFilter !== 'all') {
-                filteredTasks = tasks.filter(task => task.difficulty === taskFilter);
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
             }
+
+            const filter = taskFilter.value;
+            const filteredTasks = tasks.filter(t => filter === 'all' || t.difficulty === filter);
             const randomIndex = Math.floor(Math.random() * filteredTasks.length);
-            const randomTask = filteredTasks[randomIndex];
-            taskDisplay.textContent = randomTask ? randomTask.task : 'No tasks available';
-            startCompleteTaskTimer();
+            currentTask = filteredTasks[randomIndex];
+            taskDisplay.textContent = currentTask.task;
+
+            completeTaskButton.style.display = 'inline-block';
+            getTaskButton.style.display = 'none';
+
+            if (timer) {
+                clearInterval(timer);
+            }
+
+            let secondsLeft = 60;
+            timer = setInterval(() => {
+                if (secondsLeft <= 0) {
+                    clearInterval(timer);
+                    timer = null;
+                    completeTaskButton.disabled = false;
+                    return;
+                }
+                secondsLeft--;
+            }, 1000);
+
+            getTaskButton.style.display = 'none';
+            taskDisplay.textContent = currentTask.task;
         }
 
         function completeTask() {
-            const pointsDisplay = document.getElementById('pointsDisplay');
-            let points = parseInt(pointsDisplay.textContent.split(' ')[1]);
-            points += 1;
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+            }
+            points++;
             pointsDisplay.textContent = `Points: ${points}`;
-            savePoints(points);
-            document.getElementById('completeTaskBtn').style.display = 'none';
+            completeTaskButton.style.display = 'none';
+            getTaskButton.style.display = 'inline-block';
         }
 
-        function savePoints(points) {
-            localStorage.setItem('points', points);
+        function toggleSettings() {
+            const settingsMenu = document.getElementById('settingsMenu');
+            settingsMenu.classList.toggle('show');
         }
 
-        function loadPoints() {
-            const points = localStorage.getItem('points');
-            if (points !== null) {
-                document.getElementById('pointsDisplay').textContent = `Points: ${points}`;
-            }
-        }
+        colorPicker.addEventListener('input', (event) => {
+            document.body.style.backgroundColor = event.target.value;
+        });
 
-        function startCompleteTaskTimer() {
-            const completeTaskBtn = document.getElementById('completeTaskBtn');
-            completeTaskBtn.style.display = 'inline-block';
-            completeTaskBtn.disabled = true;
-            let timer = 60;
-            const interval = setInterval(() => {
-                timer--;
-                completeTaskBtn.textContent = `Complete Task (${timer}s)`;
-                if (timer === 0) {
-                    clearInterval(interval);
-                    completeTaskBtn.textContent = 'Complete Task';
-                    completeTaskBtn.disabled = false;
+        particlesJS('particles-js', {
+            "particles": {
+                "number": {
+                    "value": 50,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": "#ffffff"
+                },
+                "shape": {
+                    "type": "circle",
+                    "stroke": {
+                        "width": 0,
+                        "color": "#000000"
+                    },
+                    "polygon": {
+                        "nb_sides": 5
+                    }
+                },
+                "opacity": {
+                    "value": 0.5,
+                    "random": false,
+                    "anim": {
+                        "enable": false,
+                        "speed": 1,
+                        "opacity_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "size": {
+                    "value": 3,
+                    "random": true,
+                    "anim": {
+                        "enable": false,
+                        "speed": 40,
+                        "size_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#ffffff",
+                    "opacity": 0.4,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 6,
+                    "direction": "none",
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false,
+                    "attract": {
+                        "enable": false,
+                        "rotateX": 600,
+                        "rotateY": 1200
+                    }
                 }
-            }, 1000);
-        }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": {
+                        "enable": true,
+                        "mode": "repulse"
+                    },
+                    "onclick": {
+                        "enable": true,
+                        "mode": "push"
+                    },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": {
+                        "distance": 400,
+                        "line_linked": {
+                            "opacity": 1
+                        }
+                    },
+                    "bubble": {
+                        "distance": 400,
+                        "size": 40,
+                        "duration": 2,
+                        "opacity": 0.8,
+                        "speed": 3
+                    },
+                    "repulse": {
+                        "distance": 200,
+                        "duration": 0.4
+                    },
+                    "push": {
+                        "particles_nb": 4
+                    },
+                    "remove": {
+                        "particles_nb": 2
+                    }
+                }
+            },
+            "retina_detect": true
+        });
 
-        function setRandomBackgroundColor() {
-            const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
-            document.body.style.background = randomColor;
-        }
-
-        window.onload = () => {
-            setRandomBackgroundColor();
-            loadPoints();
-            particlesJS.load('particles-js', 'particles.json', function() {
-                console.log('particles.js loaded - callback');
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('colorPicker').addEventListener('input', (event) => {
+                document.body.style.backgroundColor = event.target.value;
             });
-        };
 
-        document.body.addEventListener('click', () => {
-            if (music.paused) {
-                music.play();
-            }
+            taskFilter.addEventListener('change', generateTask);
         });
     </script>
 </body>
