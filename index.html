@@ -47,6 +47,7 @@
             max-width: 80%;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
             display: inline-block;
+            margin-top: 1em;
         }
         .container {
             text-align: center;
@@ -119,7 +120,7 @@
     <div class="container">
         <h1>Random Task Generator</h1>
         <button onclick="generateTask()">Get a Random Task</button>
-        <button id="completeTaskBtn" onclick="completeTask()" disabled>Complete Task</button>
+        <button id="completeTaskBtn" onclick="completeTask()" style="display:none;" disabled>Complete Task</button>
         <p id="taskDisplay"></p>
         <div class="points" id="pointsDisplay">Points: 0</div>
     </div>
@@ -333,7 +334,7 @@
             points += 1;
             pointsDisplay.textContent = `Points: ${points}`;
             savePoints(points);
-            document.getElementById('completeTaskBtn').disabled = true;
+            document.getElementById('completeTaskBtn').style.display = 'none';
         }
 
         function savePoints(points) {
@@ -349,6 +350,7 @@
 
         function startCompleteTaskTimer() {
             const completeTaskBtn = document.getElementById('completeTaskBtn');
+            completeTaskBtn.style.display = 'inline-block';
             completeTaskBtn.disabled = true;
             let timer = 60;
             const interval = setInterval(() => {
