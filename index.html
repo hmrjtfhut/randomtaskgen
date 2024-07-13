@@ -16,6 +16,7 @@
             margin: 0;
             color: #333;
             text-align: center;
+            overflow: hidden;
         }
         h1 {
             font-size: 3em;
@@ -86,6 +87,14 @@
             margin-top: 1em;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
         }
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
     </style>
 </head>
 <body>
@@ -112,11 +121,12 @@
         <p id="taskDisplay"></p>
         <div class="points" id="pointsDisplay">Points: 0</div>
     </div>
-    <audio id="backgroundMusic" loop>
+    <audio id="backgroundMusic" loop autoplay>
         <source src="your-music-file.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
-
+    <div id="particles-js"></div>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
         const tasks = [
  { task: "Go outside", difficulty: "easy" },
@@ -289,55 +299,45 @@
             { task: "Have a romantic sunset with somone you love", difficulty: "hard" },
             { task: "Find find true love", difficulty: "impossible" }
         ];
-
-        let points = 0;
+        
+        const music = document.getElementById('backgroundMusic');
+        music.volume = 0.2;
+        
+        function toggleSettings() {
+            const menu = document.getElementById('settingsMenu');
+            menu.classList.toggle('show');
+        }
 
         function generateTask() {
+            const taskDisplay = document.getElementById('taskDisplay');
             const taskFilter = document.getElementById('taskFilter').value;
             let filteredTasks = tasks;
-
             if (taskFilter !== 'all') {
                 filteredTasks = tasks.filter(task => task.difficulty === taskFilter);
             }
-
             const randomIndex = Math.floor(Math.random() * filteredTasks.length);
-            const task = filteredTasks[randomIndex].task;
-
-            // Split the task into words and find the center word
-            const words = task.split(' ');
-            const centerIndex = Math.floor(words.length / 2);
-
-            // Join the words and center them
-            const centeredTask = words.map((word, index) => {
-                if (index === centerIndex) {
-                    return `<span style="display: inline-block;">${word}</span>`;
-                }
-                return word;
-            }).join(' ');
-
-            document.getElementById('taskDisplay').innerHTML = centeredTask;
+            const randomTask = filteredTasks[randomIndex];
+            taskDisplay.textContent = randomTask ? randomTask.task : 'No tasks available';
         }
 
         function completeTask() {
-            points++;
-            document.getElementById('pointsDisplay').innerText = `Points: ${points}`;
+            const pointsDisplay = document.getElementById('pointsDisplay');
+            let points = parseInt(pointsDisplay.textContent.split(' ')[1]);
+            points += 1;
+            pointsDisplay.textContent = `Points: ${points}`;
         }
 
-        function toggleSettings() {
-            const settingsMenu = document.getElementById('settingsMenu');
-            settingsMenu.classList.toggle('show');
+        function setRandomBackgroundColor() {
+            const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+            document.body.style.background = randomColor;
         }
 
-        document.getElementById('colorPicker').addEventListener('input', function() {
-            const color = this.value;
-            document.body.style.background = `linear-gradient(to right, ${color}, #feb47b)`;
-        });
-
-        // Play background music
-        window.addEventListener('load', function() {
-            const backgroundMusic = document.getElementById('backgroundMusic');
-            backgroundMusic.play();
-        });
+        window.onload = () => {
+            setRandomBackgroundColor();
+            particlesJS.load('particles-js', 'particles.json', function() {
+                console.log('particles.js loaded - callback');
+            });
+        };
     </script>
 </body>
 </html>
