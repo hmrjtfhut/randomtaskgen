@@ -8,28 +8,62 @@
         body {
             font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             margin: 0;
             background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
             color: white;
             text-align: center;
+            position: relative;
         }
         #pointsDisplay {
             position: absolute;
             top: 10px;
             left: 10px;
+            color: #000;
         }
-        #settings {
+        #settingsButton {
             position: absolute;
             top: 10px;
             right: 10px;
+            background-color: #6495ed;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
-        #info {
+        #settingsPopup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            color: black;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #settingsPopup.show {
+            display: block;
+        }
+        #closeSettings {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+        #infoButton {
             position: absolute;
             bottom: 10px;
             right: 10px;
+            background-color: #6495ed;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
         #infoPopup {
             position: absolute;
@@ -66,11 +100,11 @@
             background-color: #32cd32;
             display: none;
         }
-        #settingsButton {
-            background-color: #6495ed;
-        }
         #taskDisplay {
             margin-top: 20px;
+        }
+        #timerDisplay {
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -91,6 +125,10 @@
         <p>Click "Get a Random Task" to receive a task.</p>
         <p>Complete the task and click "Complete Task" to earn points.</p>
         <p>Points are displayed at the top left of the screen.</p>
+    </div>
+    <div id="settingsPopup">
+        <div id="closeSettings" onclick="closeSettings()">X</div>
+        <p>Settings will be implemented soon.</p>
     </div>
     <div id="particles-js"></div>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
@@ -275,13 +313,17 @@
         }
 
         function showSettings() {
-            alert('Settings will be implemented soon.');
+            document.getElementById('settingsPopup').classList.add('show');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsPopup').classList.remove('show');
         }
 
         function generateTask() {
             const randomIndex = Math.floor(Math.random() * tasks.length);
             const task = tasks[randomIndex];
-            document.getElementById('taskDisplay').innerText = task;
+            document.getElementById('taskDisplay').innerText = `${task.task} (${task.difficulty})`;
             document.getElementById('completeTaskButton').style.display = 'inline-block';
             document.getElementById('completeTaskButton').disabled = true;
 
