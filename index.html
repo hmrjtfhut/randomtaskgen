@@ -169,7 +169,7 @@
     <div class="container">
         <h1>Random Task Generator</h1>
         <button id="getTaskButton" onclick="generateTask()">Get a Random Task</button>
-        <button id="completeTaskButton" onclick="completeTask()" disabled>Complete Task</button>
+        <button id="completeTaskButton" onclick="completeTask()" style="display:none;" disabled>Complete Task</button>
         <p id="taskDisplay"></p>
         <div class="timer" id="timerDisplay"></div>
     </div>
@@ -393,9 +393,6 @@
                 lastTaskTime = now;
                 generateTask();
             });
-
-            const completeTaskButton = document.getElementById('completeTaskButton');
-            completeTaskButton.addEventListener('click', completeTask);
 
             showInfoIfFirstVisit();
         });
