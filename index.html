@@ -6,408 +6,122 @@
     <title>Random Task Generator</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            font-family: Arial, sans-serif;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            color: #333;
-            text-align: center;
-            overflow: hidden;
-        }
-        h1 {
-            font-size: 3em;
-            margin-bottom: 0.5em;
+            background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
             color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        button, select {
-            font-size: 1.5em;
-            padding: 0.5em 1.5em;
-            margin-bottom: 1em;
-            background-color: #fff;
-            color: #ff7e5f;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        button:hover, select:hover {
-            background-color: #ff7e5f;
-            color: #fff;
-        }
-        #taskDisplay {
-            font-size: 2em;
-            padding: 0 1em;
-            color: white;
-            max-width: 80%;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-            display: inline-block;
-            margin-top: 0.5em;
-        }
-        .container {
             text-align: center;
         }
-        .settings {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
-        .settings-menu {
-            display: none;
-            position: absolute;
-            top: 50px;
-            right: 10px;
-            background: #fff;
-            padding: 1em;
-            border-radius: 5px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .settings-menu.show {
-            display: block;
-        }
-        label {
-            display: block;
-            margin-bottom: 0.5em;
-        }
-        .credit, .points {
+        #pointsDisplay {
             position: absolute;
             top: 10px;
             left: 10px;
-            font-size: 1em;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
         }
-        .points {
-            top: 30px;
-        }
-        .timer {
-            margin-top: 1em;
-            font-size: 1em;
-            color: white;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-        }
-        #particles-js {
+        #settings {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: -1;
+            top: 10px;
+            right: 10px;
         }
-        .info {
+        #info {
             position: absolute;
             bottom: 10px;
             right: 10px;
-            font-size: 1em;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
         }
-        .info-popup {
-            display: none;
+        #infoPopup {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: #fff;
-            padding: 2em;
+            background-color: white;
+            color: black;
+            padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            z-index: 10;
-            width: 80%;
-            max-width: 400px;
-            text-align: left;
+            display: none;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .info-popup.show {
+        #infoPopup.show {
             display: block;
         }
-        .info-popup button {
-            display: block;
-            margin-top: 1em;
-            background-color: #ff7e5f;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            padding: 0.5em 1em;
-            cursor: pointer;
-        }
-        .close-popup {
+        #closeInfo {
             position: absolute;
             top: 10px;
             right: 10px;
-            font-size: 1.2em;
             cursor: pointer;
+        }
+        .button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #generateTaskButton {
+            background-color: #ff7f50;
+        }
+        #completeTaskButton {
+            background-color: #32cd32;
+            display: none;
+        }
+        #settingsButton {
+            background-color: #6495ed;
+        }
+        #taskDisplay {
+            margin-top: 20px;
         }
     </style>
 </head>
-<body>
-    <div class="credit">Made by @HarshHelium</div>
-    <div class="points" id="pointsDisplay">Points: 0</div>
-    <div class="settings">
-        <button onclick="toggleSettings()">Settings</button>
-        <div class="settings-menu" id="settingsMenu">
-            <label for="colorPicker">Choose Background Color:</label>
-            <input type="color" id="colorPicker" value="#ff7e5f">
-            <label for="taskFilter">Choose Task Difficulty:</label>
-            <select id="taskFilter">
-                <option value="all">All</option>
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
-                <option value="impossible">Impossible</option>
-            </select>
-            <label for="volumeControl">Volume:</label>
-            <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="0.2">
-            <button onclick="stopMusic()">Stop Music</button>
-        </div>
-    </div>
-    <div class="container">
+<body onload="startMusic(); showInfoIfFirstVisit();">
+    <div id="pointsDisplay">Made by @HarshHelium<br>Points: <span id="points">0</span></div>
+    <button id="settingsButton" class="button" onclick="showSettings()">Settings</button>
+    <div>
         <h1>Random Task Generator</h1>
-        <button id="getTaskButton" onclick="generateTask()">Get a Random Task</button>
-        <button id="completeTaskButton" onclick="completeTask()" style="display:none;" disabled>Complete Task</button>
-        <p id="taskDisplay"></p>
-        <div class="timer" id="timerDisplay"></div>
+        <button id="generateTaskButton" class="button" onclick="generateTask()">Get a Random Task</button>
+        <button id="completeTaskButton" class="button" onclick="completeTask()">Complete Task</button>
+        <div id="taskDisplay"></div>
+        <div id="timerDisplay"></div>
     </div>
-    <audio id="backgroundMusic" loop autoplay>
-        <source src="your-music-file.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
+    <button id="infoButton" class="button" onclick="showInfo()">Info</button>
+    <div id="infoPopup">
+        <div id="closeInfo" onclick="closeInfo()">X</div>
+        <p>Welcome to the Random Task Generator!</p>
+        <p>Click "Get a Random Task" to receive a task.</p>
+        <p>Complete the task and click "Complete Task" to earn points.</p>
+        <p>Points are displayed at the top left of the screen.</p>
+    </div>
     <div id="particles-js"></div>
-    <div class="info" onclick="showInfo()">Info</div>
-    <div class="info-popup" id="infoPopup">
-        <div class="close-popup" onclick="closeInfo()">x</div>
-        <h2>How to Use</h2>
-        <p>Welcome to the Random Task Generator! Here's how it works:</p>
-        <ul>
-            <li>Click "Get a Random Task" to receive a task.</li>
-            <li>Complete the task to earn points. You can only complete the task after 1 minute.</li>
-            <li>You can get a new task every hour.</li>
-            <li>Customize the experience using the settings menu.</li>
-        </ul>
-        <button onclick="closeInfo()">Got it!</button>
-    </div>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
         const tasks = [
-            { task: "Go outside", difficulty: "easy" },
-            { task: "Do 10 jumping jacks", difficulty: "easy" },
-            { task: "Find someone named Joe", difficulty: "medium" },
-            { task: "Buy a pack of gum", difficulty: "easy" },
-            { task: "Ask a stranger for directions", difficulty: "easy" },
-            { task: "Visit a new coffee shop", difficulty: "medium" },
-            { task: "Learn how to say 'hello' in five different languages", difficulty: "hard" },
-            { task: "Compliment a stranger", difficulty: "easy" },
-            { task: "Take a selfie with a statue", difficulty: "medium" },
-            { task: "Find a red car and take a picture of it", difficulty: "easy" },
-            { task: "Write a letter to your local representative", difficulty: "hard" },
-            { task: "Donate to a charity", difficulty: "medium" },
-            { task: "Leave a positive review for a local business", difficulty: "easy" },
-            { task: "Try a new dish at a restaurant", difficulty: "medium" },
-            { task: "Take a photo of a beautiful sunset", difficulty: "easy" },
-            { task: "Give a flower to someone", difficulty: "easy" },
-            { task: "Attend a local event", difficulty: "medium" },
-            { task: "Go to a park and read a book", difficulty: "easy" },
-            { task: "Try a new workout class", difficulty: "medium" },
-            { task: "Find a four-leaf clover", difficulty: "hard" },
-            { task: "Start a conversation with a stranger", difficulty: "medium" },
-            { task: "Visit a nearby town", difficulty: "hard" },
-            { task: "Send a postcard to a friend", difficulty: "medium" },
-            { task: "Take a photo with a street performer", difficulty: "easy" },
-            { task: "Buy a local newspaper and read it", difficulty: "easy" },
-            { task: "Find a new hiking trail", difficulty: "medium" },
-            { task: "Ask a stranger about their day", difficulty: "medium" },
-            { task: "Visit a local museum", difficulty: "medium" },
-            { task: "Try a new ice cream flavor", difficulty: "easy" },
-            { task: "Find a street with your name", difficulty: "hard" },
-            { task: "Visit a bookstore and buy a book", difficulty: "easy" },
-            { task: "Give a small gift to someone", difficulty: "easy" },
-            { task: "Find a local landmark and take a photo", difficulty: "medium" },
-            { task: "Try a new type of tea", difficulty: "easy" },
-            { task: "Ask someone about their favorite book", difficulty: "easy" },
-            { task: "Visit a farmer's market", difficulty: "easy" },
-            { task: "Find a piece of street art and take a photo", difficulty: "medium" },
-            { task: "Buy a plant and take care of it", difficulty: "medium" },
-            { task: "Give someone a hug", difficulty: "easy" },
-            { task: "Write a thank-you note to someone", difficulty: "easy" },
-            { task: "Find a local library and borrow a book", difficulty: "medium" },
-            { task: "Learn about a local historical figure", difficulty: "medium" },
-            { task: "Visit a local art gallery", difficulty: "medium" },
-            { task: "Take a day trip to a nearby city", difficulty: "medium" },
-            { task: "Find a dog and pet it", difficulty: "easy" },
-            { task: "Try a new type of cuisine", difficulty: "easy" },
-            { task: "Ask someone about their favorite movie", difficulty: "easy" },
-            { task: "Find a bakery and try a pastry", difficulty: "easy" },
-            { task: "Take a walk and collect interesting rocks", difficulty: "easy" },
-            { task: "Join a local club or group", difficulty: "medium" },
-            { task: "Go to a flea market", difficulty: "medium" },
-            { task: "Ask a friend to tell you a joke", difficulty: "easy" },
-            { task: "Take a photo with a police officer", difficulty: "medium" },
-            { task: "Visit a local farm", difficulty: "medium" },
-            { task: "Find a place with a beautiful view", difficulty: "medium" },
-            { task: "Attend a local sports game", difficulty: "medium" },
-            { task: "Find a new podcast to listen to", difficulty: "easy" },
-            { task: "Take a different route to work or school", difficulty: "easy" },
-            { task: "Make a new friend", difficulty: "hard" },
-            { task: "Visit a local zoo or aquarium", difficulty: "medium" },
-            { task: "Learn about the history of your town", difficulty: "medium" },
-            { task: "Try a new hairstyle", difficulty: "medium" },
-            { task: "Find a local craft fair", difficulty: "medium" },
-            { task: "Take a cooking class", difficulty: "hard" },
-            { task: "Find a hidden gem in your city", difficulty: "hard" },
-            { task: "Ask someone about their favorite holiday", difficulty: "easy" },
-            { task: "Take a photo with a firefighter", difficulty: "medium" },
-            { task: "Go to a local brewery or winery", difficulty: "medium" },
-            { task: "Find a new local bakery", difficulty: "easy" },
-            { task: "Take a photo with a stranger", difficulty: "hard" },
-            { task: "Write a letter to your favorite author", difficulty: "medium" },
-            { task: "Visit a new city", difficulty: "hard" },
-            { task: "Try a new kind of dessert", difficulty: "easy" },
-            { task: "Ask someone about their favorite vacation spot", difficulty: "easy" },
-            { task: "Take a photo with a street performer", difficulty: "easy" },
-            { task: "Go to a local concert", difficulty: "medium" },
-            { task: "Find a new local restaurant", difficulty: "medium" },
-            { task: "Take a photo with a police officer", difficulty: "medium" },
-            { task: "Buy a ticket to a local museum", difficulty: "medium" },
-            { task: "Visit a new town", difficulty: "medium" },
-            { task: "Try a new type of coffee", difficulty: "easy" },
-            { task: "Ask someone about their favorite TV show", difficulty: "easy" },
-            { task: "Take a photo with a street sign", difficulty: "easy" },
-            { task: "Visit a local temple", difficulty: "medium" },
-            { task: "Take a painting class", difficulty: "hard" },
-            { task: "Find a new local cafe", difficulty: "easy" },
-            { task: "Go to a local art fair", difficulty: "medium" },
-            { task: "Ask someone about their favorite food", difficulty: "easy" },
-            { task: "Take a photo with a dog", difficulty: "easy" },
-            { task: "Write a letter to your favorite musician", difficulty: "medium" },
-            { task: "Visit a new park", difficulty: "easy" },
-            { task: "Try a new kind of fruit", difficulty: "easy" },
-            { task: "Ask someone about their favorite game", difficulty: "easy" },
-            { task: "Take a photo with a street performer", difficulty: "easy" },
-            { task: "Go to a local sports game", difficulty: "medium" },
-            { task: "Find a new local bar", difficulty: "medium" },
-            { task: "Take a photo with a firefighter", difficulty: "medium" },
-            { task: "Buy a ticket to a local play", difficulty: "medium" },
-            { task: "Visit a new museum", difficulty: "medium" },
-            { task: "Try a new kind of tea", difficulty: "easy" },
-            { task: "Ask someone about their favorite childhood memory", difficulty: "easy" },
-            { task: "Take a photo with a street sign", difficulty: "easy" },
-            { task: "Visit a local mosque", difficulty: "medium" },
-            { task: "Take a sculpting class", difficulty: "hard" },
-            { task: "Find a new local deli", difficulty: "easy" },
-            { task: "Go to a local farmers market", difficulty: "easy" },
-            { task: "Ask someone about their favorite hobby", difficulty: "easy" },
-            { task: "Take a photo with a cat", difficulty: "easy" },
-            { task: "Write a letter to your favorite actor", difficulty: "medium" },
-            { task: "Visit a new neighborhood", difficulty: "medium" },
-            { task: "Try a new kind of soup", difficulty: "easy" },
-            { task: "Ask someone about their favorite dessert", difficulty: "easy" },
-            { task: "Take a photo with a stranger", difficulty: "hard" },
-            { task: "Go to a local sports event", difficulty: "medium" },
-            { task: "Find a new local cafe", difficulty: "easy" },
-            { task: "Take a photo with a street performer", difficulty: "easy" },
-            { task: "Buy a ticket to a local theater show", difficulty: "medium" },
-            { task: "Visit a new library", difficulty: "medium" },
-            { task: "Try a new kind of sandwich", difficulty: "easy" },
-            { task: "Ask someone about their favorite season", difficulty: "easy" },
-            { task: "Take a photo with a street sign", difficulty: "easy" },
-            { task: "Visit a local mosque", difficulty: "medium" },
-            { task: "Take a painting class", difficulty: "hard" },
-            { task: "Find a new local shop", difficulty: "easy" },
-            { task: "Go to a local craft fair", difficulty: "medium" },
-            { task: "Ask someone about their favorite place to travel", difficulty: "easy" },
-            { task: "Take a photo with a dog", difficulty: "easy" },
-            { task: "Write a letter to your favorite musician", difficulty: "medium" },
-            { task: "Visit a new park", difficulty: "easy" },
-            { task: "Try a new kind of pastry", difficulty: "easy" },
-            { task: "Ask someone about their favorite hobby", difficulty: "easy" },
-            { task: "Take a photo with a street performer", difficulty: "easy" },
-            { task: "Go to a local theater performance", difficulty: "medium" },
-            { task: "Find a new local cafe", difficulty: "easy" },
-            { task: "Take a photo with a firefighter", difficulty: "medium" },
-            { task: "Buy a ticket to a local concert", difficulty: "medium" },
-            { task: "Visit a new museum", difficulty: "medium" },
-            { task: "Try a new kind of drink", difficulty: "easy" },
-            { task: "Ask someone about their favorite childhood memory", difficulty: "easy" },
-            { task: "Take a photo with a street sign", difficulty: "easy" },
-            { task: "Visit a local mosque", difficulty: "medium" },
-            { task: "Take a pottery class", difficulty: "medium" },
-            { task: "Find a new local market", difficulty: "easy" },
-            { task: "Go to a local farmers market", difficulty: "easy" },
-            { task: "Ask someone about their favorite holiday", difficulty: "easy" },
-            { task: "Take a photo with a cat", difficulty: "easy" },
-            { task: "Play Minecraft", difficulty: "easy" },
-            { task: "Play Among Us", difficulty: "easy" },
-            { task: "Watch a movie", difficulty: "easy" },
-            { task: "Watch 'Inception'", difficulty: "easy" },
-            { task: "Watch 'The Matrix'", difficulty: "easy" },
-            { task: "Watch a TV show", difficulty: "easy" },
-            { task: "Watch 'Friends'", difficulty: "easy" },
-            { task: "Watch 'Breaking Bad'", difficulty: "easy" },
-            { task: "Watch 'Stranger Things'", difficulty: "easy" },
-            { task: "Visit a theme park", difficulty: "hard" },
-            { task: "Learn a new language", difficulty: "hard" },
-            { task: "Run a marathon", difficulty: "hard" },
-            { task: "Write a book", difficulty: "hard" },
-            { task: "Start a YouTube channel", difficulty: "hard" },
-            { task: "Go on a vacation", difficulty: "hard" },
-            { task: "Get a new job", difficulty: "hard" },
-            { task: "Move to a new city", difficulty: "hard" },
-            { task: "Learn to play a musical instrument", difficulty: "hard" },
-            { task: "Join a sports team", difficulty: "hard" },
-            { task: "Find an abandoned building", difficulty: "medium" },
-            { task: "Explore an abandoned location", difficulty: "hard" },
-            { task: "Have a romantic sunset with somone you love", difficulty: "hard" },
-            { task: "Find find true love", difficulty: "impossible" }
+            'Do 10 push-ups',
+            'Read a chapter of a book',
+            'Go for a 10-minute walk',
+            'Write a journal entry',
+            'Draw something',
+            'Meditate for 5 minutes',
+            'Watch a TED talk',
+            'Learn a new word',
+            'Listen to a new song',
+            'Try a new recipe'
         ];
-
         let points = 0;
-        let task = '';
         let timerInterval;
-        let lastTaskTime = 0;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const colorPicker = document.getElementById('colorPicker');
-            colorPicker.addEventListener('input', (event) => {
-                document.body.style.background = event.target.value;
-            });
-
-            const volumeControl = document.getElementById('volumeControl');
-            volumeControl.addEventListener('input', (event) => {
-                document.getElementById('backgroundMusic').volume = event.target.value;
-            });
-
-            const getTaskButton = document.getElementById('getTaskButton');
-            getTaskButton.addEventListener('click', () => {
-                const now = Date.now();
-                const hourInMillis = 1000 * 60 * 60;
-                if (now - lastTaskTime < hourInMillis) {
-                    alert('You can only get a new task every hour.');
-                    return;
-                }
-
-                lastTaskTime = now;
-                generateTask();
-            });
-
-            showInfoIfFirstVisit();
-        });
-
-        function toggleSettings() {
-            document.getElementById('settingsMenu').classList.toggle('show');
+        function startMusic() {
+            const backgroundMusic = document.getElementById('backgroundMusic');
+            backgroundMusic.play();
         }
 
-        function stopMusic() {
-            document.getElementById('backgroundMusic').pause();
+        function showSettings() {
+            alert('Settings will be implemented soon.');
         }
 
         function generateTask() {
             const randomIndex = Math.floor(Math.random() * tasks.length);
-            task = tasks[randomIndex];
+            const task = tasks[randomIndex];
             document.getElementById('taskDisplay').innerText = task;
             document.getElementById('completeTaskButton').style.display = 'inline-block';
             document.getElementById('completeTaskButton').disabled = true;
@@ -429,7 +143,7 @@
 
         function completeTask() {
             points++;
-            document.getElementById('pointsDisplay').innerText = `Points: ${points}`;
+            document.getElementById('points').innerText = points;
             document.getElementById('completeTaskButton').style.display = 'none';
             document.getElementById('taskDisplay').innerText = '';
         }
@@ -545,5 +259,6 @@
             "retina_detect": true
         });
     </script>
+    <audio id="backgroundMusic" src="your-music-file.mp3" loop></audio>
 </body>
 </html>
