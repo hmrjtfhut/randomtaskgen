@@ -395,8 +395,7 @@
             });
 
             const completeTaskButton = document.getElementById('completeTaskButton');
-            completeTaskButton.style.display = 'none';
-            document.getElementById('backgroundMusic').volume = volumeControl.value;
+            completeTaskButton.addEventListener('click', completeTask);
 
             showInfoIfFirstVisit();
         });
