@@ -74,7 +74,7 @@
             display: block;
             margin-bottom: 0.5em;
         }
-        .credit {
+        .credit, .points {
             position: absolute;
             top: 10px;
             left: 10px;
@@ -83,10 +83,7 @@
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
         }
         .points {
-            font-size: 1.5em;
-            color: white;
-            margin-top: 1em;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+            top: 30px;
         }
         .timer {
             margin-top: 1em;
@@ -102,10 +99,55 @@
             left: 0;
             z-index: -1;
         }
+        .info {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 1em;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+        .info-popup {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 2em;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            width: 80%;
+            max-width: 400px;
+            text-align: left;
+        }
+        .info-popup.show {
+            display: block;
+        }
+        .info-popup button {
+            display: block;
+            margin-top: 1em;
+            background-color: #ff7e5f;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 0.5em 1em;
+            cursor: pointer;
+        }
+        .close-popup {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div class="credit">Made by @HarshHelium</div>
+    <div class="points" id="pointsDisplay">Points: 0</div>
     <div class="settings">
         <button onclick="toggleSettings()">Settings</button>
         <div class="settings-menu" id="settingsMenu">
@@ -129,7 +171,6 @@
         <button id="getTaskButton" onclick="generateTask()">Get a Random Task</button>
         <button id="completeTaskButton" onclick="completeTask()" disabled>Complete Task</button>
         <p id="taskDisplay"></p>
-        <div class="points" id="pointsDisplay">Points: 0</div>
         <div class="timer" id="timerDisplay"></div>
     </div>
     <audio id="backgroundMusic" loop autoplay>
@@ -137,6 +178,19 @@
         Your browser does not support the audio element.
     </audio>
     <div id="particles-js"></div>
+    <div class="info" onclick="showInfo()">Info</div>
+    <div class="info-popup" id="infoPopup">
+        <div class="close-popup" onclick="closeInfo()">x</div>
+        <h2>How to Use</h2>
+        <p>Welcome to the Random Task Generator! Here's how it works:</p>
+        <ul>
+            <li>Click "Get a Random Task" to receive a task.</li>
+            <li>Complete the task to earn points. You can only complete the task after 1 minute.</li>
+            <li>You can get a new task every hour.</li>
+            <li>Customize the experience using the settings menu.</li>
+        </ul>
+        <button onclick="closeInfo()">Got it!</button>
+    </div>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
         const tasks = [
@@ -328,7 +382,6 @@
             });
 
             const getTaskButton = document.getElementById('getTaskButton');
-            const completeTaskButton = document.getElementById('completeTaskButton');
             getTaskButton.addEventListener('click', () => {
                 const now = Date.now();
                 const hourInMillis = 1000 * 60 * 60;
@@ -339,18 +392,17 @@
 
                 lastTaskTime = now;
                 generateTask();
-                completeTaskButton.disabled = false;
-                clearInterval(timerInterval);
-                document.getElementById('timerDisplay').textContent = '';
             });
 
-            document.getElementById('colorPicker').value = '#ff7e5f';
-            document.getElementById('volumeControl').value = 0.2;
+            const completeTaskButton = document.getElementById('completeTaskButton');
+            completeTaskButton.style.display = 'none';
+            document.getElementById('backgroundMusic').volume = volumeControl.value;
+
+            showInfoIfFirstVisit();
         });
 
         function toggleSettings() {
-            const menu = document.getElementById('settingsMenu');
-            menu.classList.toggle('show');
+            document.getElementById('settingsMenu').classList.toggle('show');
         }
 
         function stopMusic() {
@@ -358,42 +410,54 @@
         }
 
         function generateTask() {
-            const filter = document.getElementById('taskFilter').value;
-            const filteredTasks = tasks.filter(task => filter === 'all' || task.difficulty === filter);
-            const randomTask = filteredTasks[Math.floor(Math.random() * filteredTasks.length)];
-            task = randomTask.task;
-            document.getElementById('taskDisplay').textContent = task;
+            const randomIndex = Math.floor(Math.random() * tasks.length);
+            task = tasks[randomIndex];
+            document.getElementById('taskDisplay').innerText = task;
+            document.getElementById('completeTaskButton').style.display = 'inline-block';
+            document.getElementById('completeTaskButton').disabled = true;
 
-            document.getElementById('getTaskButton').disabled = true;
-
-            document.getElementById('completeTaskButton').disabled = false;
-
-            // Start the timer for the "Complete Task" button
-            let timeLeft = 60;
-            document.getElementById('timerDisplay').textContent = `Time left: ${timeLeft}s`;
-
+            clearInterval(timerInterval);
+            let countdown = 60;
+            const timerDisplay = document.getElementById('timerDisplay');
+            timerDisplay.innerText = `Time until you can complete task: ${countdown}s`;
             timerInterval = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timerDisplay').textContent = `Time left: ${timeLeft}s`;
-                if (timeLeft <= 0) {
+                countdown--;
+                timerDisplay.innerText = `Time until you can complete task: ${countdown}s`;
+                if (countdown <= 0) {
                     clearInterval(timerInterval);
                     document.getElementById('completeTaskButton').disabled = false;
-                    document.getElementById('timerDisplay').textContent = '';
+                    timerDisplay.innerText = '';
                 }
             }, 1000);
         }
 
         function completeTask() {
-            points += 10;
-            document.getElementById('pointsDisplay').textContent = `Points: ${points}`;
-            document.getElementById('completeTaskButton').disabled = true;
-            document.getElementById('taskDisplay').textContent = '';
+            points++;
+            document.getElementById('pointsDisplay').innerText = `Points: ${points}`;
+            document.getElementById('completeTaskButton').style.display = 'none';
+            document.getElementById('taskDisplay').innerText = '';
+        }
+
+        function showInfo() {
+            document.getElementById('infoPopup').classList.add('show');
+        }
+
+        function closeInfo() {
+            document.getElementById('infoPopup').classList.remove('show');
+        }
+
+        function showInfoIfFirstVisit() {
+            const visitedBefore = localStorage.getItem('visitedBefore');
+            if (!visitedBefore) {
+                showInfo();
+                localStorage.setItem('visitedBefore', 'true');
+            }
         }
 
         particlesJS('particles-js', {
             "particles": {
                 "number": {
-                    "value": 100,
+                    "value": 50,
                     "density": {
                         "enable": true,
                         "value_area": 800
@@ -407,6 +471,14 @@
                     "stroke": {
                         "width": 0,
                         "color": "#000000"
+                    },
+                    "polygon": {
+                        "nb_sides": 5
+                    },
+                    "image": {
+                        "src": "img/github.svg",
+                        "width": 100,
+                        "height": 100
                     }
                 },
                 "opacity": {
