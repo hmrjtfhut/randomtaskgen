@@ -100,6 +100,7 @@
         #completeTaskButton {
             background-color: rgba(255, 255, 255, 0.2);
             display: none;
+            margin-left: 10px;
         }
         #taskDisplay {
             margin-top: 20px;
@@ -142,6 +143,10 @@
         </select>
     </div>
     <div id="particles-js"></div>
+    <audio id="backgroundMusic" loop>
+        <source src="your-music-file.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
         const tasks = [
@@ -328,11 +333,19 @@
         let task = null;
         let timer = null;
         let canGenerateTask = true;
+        let musicStarted = false;
 
         function initialize() {
             loadParticles();
             loadPoints();
             setInterval(checkCanGenerateTask, 1000);
+            document.body.addEventListener('mousemove', startMusicOnce, { once: true });
+            document.body.addEventListener('click', startMusicOnce, { once: true });
+        }
+
+        function startMusicOnce() {
+            const music = document.getElementById('backgroundMusic');
+            music.play();
         }
 
         function loadParticles() {
@@ -408,7 +421,7 @@
                 const randomIndex = Math.floor(Math.random() * filteredTasks.length);
                 task = filteredTasks[randomIndex];
                 document.getElementById('taskDisplay').textContent = task.task;
-                document.getElementById('completeTaskButton').style.display = 'block';
+                document.getElementById('completeTaskButton').style.display = 'inline-block';
                 startTimer();
                 canGenerateTask = false;
                 setTimeout(() => canGenerateTask = true, 3600000); // 1 hour timer to generate new task
