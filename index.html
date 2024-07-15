@@ -125,9 +125,9 @@
         <p>Welcome to the Random Task Generator!</p>
         <p>Click "Get a Random Task" to receive a task.</p>
         <p>Complete the task and click "Complete Task" to earn points.</p>
-        <p>Each dificulty of task has a diffrent timer till you can complete it.</p>
+        <p>Each difficulty of task has a different timer till you can complete it.</p>
         <p>Points are displayed at the top left of the screen.</p>
-        <p>Made by HarshHelium</p>
+        <p>Made by @HarshHelium</p>
     </div>
     <div id="settingsPopup">
         <div id="closeSettings" onclick="closeSettings()">X</div>
@@ -315,107 +315,79 @@
             { task: "Have a romantic sunset with somone you love", difficulty: "hard" },
             { task: "Find find true love", difficulty: "impossible" }
         ];
+
+        const difficultyTimers = {
+            easy: 10000, // 10 seconds for testing
+            medium: 30000, // 30 seconds for testing
+            hard: 60000, // 1 minute for testing
+            impossible: 60000 // 1 minute for testing
+        };
+
+        let taskMode = 'all';
         let points = 0;
-        let timerInterval;
-        let selectedTaskMode = 'all';
+        let task = null;
+        let timer = null;
+        let canGenerateTask = true;
 
         function initialize() {
+            loadParticles();
             loadPoints();
-            showInfoIfFirstVisit();
+            setInterval(checkCanGenerateTask, 1000);
+        }
+
+        function loadParticles() {
             particlesJS('particles-js', {
-                "particles": {
-                    "number": {
-                        "value": 50,
-                        "density": {
-                            "enable": true,
-                            "value_area": 800
-                        }
+                particles: {
+                    number: { value: 50 },
+                    color: { value: '#fff' },
+                    shape: { type: 'circle' },
+                    opacity: { value: 0.5 },
+                    size: { value: 3 },
+                    line_linked: {
+                        enable: true,
+                        distance: 150,
+                        color: '#fff',
+                        opacity: 0.4,
+                        width: 1
                     },
-                    "color": {
-                        "value": "#ffffff"
-                    },
-                    "shape": {
-                        "type": "circle",
-                        "stroke": {
-                            "width": 0,
-                            "color": "#000000"
-                        },
-                        "polygon": {
-                            "nb_sides": 5
-                        },
-                        "image": {
-                            "src": "img/github.svg",
-                            "width": 100,
-                            "height": 100
-                        }
-                    },
-                    "opacity": {
-                        "value": 0.5,
-                        "random": true,
-                        "anim": {
-                            "enable": false,
-                            "speed": 1,
-                            "opacity_min": 0.1,
-                            "sync": false
-                        }
-                    },
-                    "size": {
-                        "value": 3,
-                        "random": true,
-                        "anim": {
-                            "enable": false,
-                            "speed": 40,
-                            "size_min": 0.1,
-                            "sync": false
-                        }
-                    },
-                    "line_linked": {
-                        "enable": true,
-                        "distance": 150,
-                        "color": "#ffffff",
-                        "opacity": 0.4,
-                        "width": 1
-                    },
-                    "move": {
-                        "enable": true,
-                        "speed": 2,
-                        "direction": "none",
-                        "random": false,
-                        "straight": false,
-                        "out_mode": "out",
-                        "bounce": false,
-                        "attract": {
-                            "enable": false,
-                            "rotateX": 600,
-                            "rotateY": 1200
-                        }
+                    move: {
+                        enable: true,
+                        speed: 6,
+                        direction: 'none',
+                        random: false,
+                        straight: false,
+                        out_mode: 'out',
+                        bounce: false,
+                        attract: { enable: false }
                     }
                 },
-                "interactivity": {
-                    "detect_on": "canvas",
-                    "events": {
-                        "onhover": {
-                            "enable": true,
-                            "mode": "repulse"
-                        },
-                        "onclick": {
-                            "enable": true,
-                            "mode": "push"
-                        },
-                        "resize": true
+                interactivity: {
+                    detect_on: 'canvas',
+                    events: {
+                        onhover: { enable: true, mode: 'repulse' },
+                        onclick: { enable: true, mode: 'push' },
+                        resize: true
                     },
-                    "modes": {
-                        "repulse": {
-                            "distance": 100,
-                            "duration": 0.4
-                        },
-                        "push": {
-                            "particles_nb": 4
-                        }
+                    modes: {
+                        grab: { distance: 400, line_linked: { opacity: 1 } },
+                        bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 },
+                        repulse: { distance: 200 },
+                        push: { particles_nb: 4 },
+                        remove: { particles_nb: 2 }
                     }
                 },
-                "retina_detect": true
+                retina_detect: true
             });
+        }
+
+        function loadPoints() {
+            const storedPoints = localStorage.getItem('points');
+            points = storedPoints ? parseInt(storedPoints) : 0;
+            document.getElementById('points').textContent = points;
+        }
+
+        function savePoints() {
+            localStorage.setItem('points', points);
         }
 
         function showSettings() {
@@ -427,7 +399,48 @@
         }
 
         function setTaskMode(mode) {
-            selectedTaskMode = mode;
+            taskMode = mode;
+        }
+
+        function generateTask() {
+            if (canGenerateTask) {
+                const filteredTasks = taskMode === 'all' ? tasks : tasks.filter(t => t.difficulty === taskMode);
+                const randomIndex = Math.floor(Math.random() * filteredTasks.length);
+                task = filteredTasks[randomIndex];
+                document.getElementById('taskDisplay').textContent = task.task;
+                document.getElementById('completeTaskButton').style.display = 'block';
+                startTimer();
+                canGenerateTask = false;
+                setTimeout(() => canGenerateTask = true, 3600000); // 1 hour timer to generate new task
+            } else {
+                alert("You can only generate a new task every hour.");
+            }
+        }
+
+        function startTimer() {
+            const duration = difficultyTimers[task.difficulty];
+            let remainingTime = duration / 1000;
+            document.getElementById('timerDisplay').textContent = `Time left: ${remainingTime}s`;
+            clearInterval(timer);
+            timer = setInterval(() => {
+                remainingTime--;
+                document.getElementById('timerDisplay').textContent = `Time left: ${remainingTime}s`;
+                if (remainingTime <= 0) {
+                    clearInterval(timer);
+                    document.getElementById('timerDisplay').textContent = 'Task completed!';
+                    document.getElementById('completeTaskButton').disabled = false;
+                }
+            }, 1000);
+            document.getElementById('completeTaskButton').disabled = true;
+        }
+
+        function completeTask() {
+            points++;
+            savePoints();
+            document.getElementById('points').textContent = points;
+            document.getElementById('taskDisplay').textContent = '';
+            document.getElementById('timerDisplay').textContent = '';
+            document.getElementById('completeTaskButton').style.display = 'none';
         }
 
         function showInfo() {
@@ -438,67 +451,11 @@
             document.getElementById('infoPopup').classList.remove('show');
         }
 
-        function showInfoIfFirstVisit() {
-            if (!localStorage.getItem('visited')) {
-                showInfo();
-                localStorage.setItem('visited', 'true');
-            }
-        }
-
-        function loadPoints() {
-            points = localStorage.getItem('points') ? parseInt(localStorage.getItem('points'), 10) : 0;
-            document.getElementById('points').innerText = points;
-        }
-
-        function savePoints() {
-            localStorage.setItem('points', points);
-        }
-
-        function generateTask() {
-            const filteredTasks = tasks.filter(task => selectedTaskMode === 'all' || task.difficulty === selectedTaskMode);
-            const randomTask = filteredTasks[Math.floor(Math.random() * filteredTasks.length)];
-            document.getElementById('taskDisplay').innerText = randomTask.task;
-            if (randomTask.difficulty === 'impossible') {
-                document.getElementById('timerDisplay').innerText = 'Your whole life';
+        function checkCanGenerateTask() {
+            if (canGenerateTask) {
+                document.getElementById('generateTaskButton').disabled = false;
             } else {
-                startTimer(randomTask.difficulty);
-            }
-            document.getElementById('completeTaskButton').style.display = 'inline-block';
-        }
-
-        function startTimer(difficulty) {
-            clearInterval(timerInterval);
-            let time = 0;
-            switch (difficulty) {
-                case 'easy':
-                    time = 5 * 60;
-                    break;
-                case 'medium':
-                    time = 10 * 60;
-                    break;
-                case 'hard':
-                    time = 30 * 60;
-                    break;
-            }
-            timerInterval = setInterval(() => {
-                if (time <= 0) {
-                    clearInterval(timerInterval);
-                    document.getElementById('timerDisplay').innerText = 'You can complete the task now.';
-                } else {
-                    time--;
-                    document.getElementById('timerDisplay').innerText = Time until you can complete task: ${Math.floor(time / 60)}m ${time % 60}s;
-                }
-            }, 1000);
-        }
-
-        function completeTask() {
-            if (document.getElementById('timerDisplay').innerText.includes('You can complete the task now')) {
-                points++;
-                savePoints();
-                document.getElementById('points').innerText = points;
-                document.getElementById('taskDisplay').innerText = '';
-                document.getElementById('timerDisplay').innerText = '';
-                document.getElementById('completeTaskButton').style.display = 'none';
+                document.getElementById('generateTaskButton').disabled = true;
             }
         }
     </script>
