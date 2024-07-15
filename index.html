@@ -109,7 +109,7 @@
         }
     </style>
 </head>
-<body onload="startMusic(); showInfoIfFirstVisit();">
+<body onload="initialize()">
     <div id="pointsDisplay">Made by @HarshHelium<br>Points: <span id="points">0</span></div>
     <button id="settingsButton" class="button" onclick="showSettings()">Settings</button>
     <div>
@@ -130,8 +130,14 @@
     <div id="settingsPopup">
         <div id="closeSettings" onclick="closeSettings()">X</div>
         <p>Settings</p>
-        <label for="volumeControl">Music Volume:</label>
-        <input type="range" id="volumeControl" name="volumeControl" min="0" max="1" step="0.1" onchange="setVolume(this.value)">
+        <label for="taskMode">Task Mode:</label>
+        <select id="taskMode" onchange="setTaskMode(this.value)">
+            <option value="all">All</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+            <option value="impossible">Impossible</option>
+        </select>
     </div>
     <div id="particles-js"></div>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
@@ -309,15 +315,105 @@
         ];
         let points = 0;
         let timerInterval;
+        let selectedTaskMode = 'all';
 
-        function startMusic() {
-            const backgroundMusic = document.getElementById('backgroundMusic');
-            backgroundMusic.play();
-        }
-
-        function setVolume(value) {
-            const backgroundMusic = document.getElementById('backgroundMusic');
-            backgroundMusic.volume = value;
+        function initialize() {
+            loadPoints();
+            showInfoIfFirstVisit();
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 50,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#ffffff"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                        "polygon": {
+                            "nb_sides": 5
+                        },
+                        "image": {
+                            "src": "img/github.svg",
+                            "width": 100,
+                            "height": 100
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.5,
+                        "random": true,
+                        "anim": {
+                            "enable": false,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": false,
+                            "speed": 40,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#ffffff",
+                        "opacity": 0.4,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 2,
+                        "direction": "none",
+                        "random": false,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": false,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "repulse"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "repulse": {
+                            "distance": 100,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
         }
 
         function showSettings() {
@@ -328,33 +424,8 @@
             document.getElementById('settingsPopup').classList.remove('show');
         }
 
-        function generateTask() {
-            const randomIndex = Math.floor(Math.random() * tasks.length);
-            const task = tasks[randomIndex];
-            document.getElementById('taskDisplay').innerText = `${task.task} (${task.difficulty})`;
-            document.getElementById('completeTaskButton').style.display = 'inline-block';
-            document.getElementById('completeTaskButton').disabled = true;
-
-            clearInterval(timerInterval);
-            let countdown = 60;
-            const timerDisplay = document.getElementById('timerDisplay');
-            timerDisplay.innerText = `Time until you can complete task: ${countdown}s`;
-            timerInterval = setInterval(() => {
-                countdown--;
-                timerDisplay.innerText = `Time until you can complete task: ${countdown}s`;
-                if (countdown <= 0) {
-                    clearInterval(timerInterval);
-                    document.getElementById('completeTaskButton').disabled = false;
-                    timerDisplay.innerText = '';
-                }
-            }, 1000);
-        }
-
-        function completeTask() {
-            points++;
-            document.getElementById('points').innerText = points;
-            document.getElementById('completeTaskButton').style.display = 'none';
-            document.getElementById('taskDisplay').innerText = '';
+        function setTaskMode(mode) {
+            selectedTaskMode = mode;
         }
 
         function showInfo() {
@@ -366,108 +437,68 @@
         }
 
         function showInfoIfFirstVisit() {
-            const visitedBefore = localStorage.getItem('visitedBefore');
-            if (!visitedBefore) {
+            if (!localStorage.getItem('visited')) {
                 showInfo();
-                localStorage.setItem('visitedBefore', 'true');
+                localStorage.setItem('visited', 'true');
             }
         }
 
-        particlesJS('particles-js', {
-            "particles": {
-                "number": {
-                    "value": 50,
-                    "density": {
-                        "enable": true,
-                        "value_area": 800
-                    }
-                },
-                "color": {
-                    "value": "#ffffff"
-                },
-                "shape": {
-                    "type": "circle",
-                    "stroke": {
-                        "width": 0,
-                        "color": "#000000"
-                    },
-                    "polygon": {
-                        "nb_sides": 5
-                    },
-                    "image": {
-                        "src": "img/github.svg",
-                        "width": 100,
-                        "height": 100
-                    }
-                },
-                "opacity": {
-                    "value": 0.5,
-                    "random": true,
-                    "anim": {
-                        "enable": false,
-                        "speed": 1,
-                        "opacity_min": 0.1,
-                        "sync": false
-                    }
-                },
-                "size": {
-                    "value": 3,
-                    "random": true,
-                    "anim": {
-                        "enable": false,
-                        "speed": 40,
-                        "size_min": 0.1,
-                        "sync": false
-                    }
-                },
-                "line_linked": {
-                    "enable": true,
-                    "distance": 150,
-                    "color": "#ffffff",
-                    "opacity": 0.4,
-                    "width": 1
-                },
-                "move": {
-                    "enable": true,
-                    "speed": 2,
-                    "direction": "none",
-                    "random": false,
-                    "straight": false,
-                    "out_mode": "out",
-                    "bounce": false,
-                    "attract": {
-                        "enable": false,
-                        "rotateX": 600,
-                        "rotateY": 1200
-                    }
+        function loadPoints() {
+            points = localStorage.getItem('points') ? parseInt(localStorage.getItem('points'), 10) : 0;
+            document.getElementById('points').innerText = points;
+        }
+
+        function savePoints() {
+            localStorage.setItem('points', points);
+        }
+
+        function generateTask() {
+            const filteredTasks = tasks.filter(task => selectedTaskMode === 'all' || task.difficulty === selectedTaskMode);
+            const randomTask = filteredTasks[Math.floor(Math.random() * filteredTasks.length)];
+            document.getElementById('taskDisplay').innerText = randomTask.task;
+            if (randomTask.difficulty === 'impossible') {
+                document.getElementById('timerDisplay').innerText = 'Your whole life';
+            } else {
+                startTimer(randomTask.difficulty);
+            }
+            document.getElementById('completeTaskButton').style.display = 'inline-block';
+        }
+
+        function startTimer(difficulty) {
+            clearInterval(timerInterval);
+            let time = 0;
+            switch (difficulty) {
+                case 'easy':
+                    time = 5 * 60;
+                    break;
+                case 'medium':
+                    time = 10 * 60;
+                    break;
+                case 'hard':
+                    time = 30 * 60;
+                    break;
+            }
+            timerInterval = setInterval(() => {
+                if (time <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timerDisplay').innerText = 'You can complete the task now.';
+                } else {
+                    time--;
+                    document.getElementById('timerDisplay').innerText = `Time until you can complete task: ${Math.floor(time / 60)}m ${time % 60}s`;
                 }
-            },
-            "interactivity": {
-                "detect_on": "canvas",
-                "events": {
-                    "onhover": {
-                        "enable": true,
-                        "mode": "repulse"
-                    },
-                    "onclick": {
-                        "enable": true,
-                        "mode": "push"
-                    },
-                    "resize": true
-                },
-                "modes": {
-                    "repulse": {
-                        "distance": 100,
-                        "duration": 0.4
-                    },
-                    "push": {
-                        "particles_nb": 4
-                    }
-                }
-            },
-            "retina_detect": true
-        });
+            }, 1000);
+        }
+
+        function completeTask() {
+            if (document.getElementById('timerDisplay').innerText.includes('You can complete the task now')) {
+                points++;
+                savePoints();
+                document.getElementById('points').innerText = points;
+                document.getElementById('taskDisplay').innerText = '';
+                document.getElementById('timerDisplay').innerText = '';
+                document.getElementById('completeTaskButton').style.display = 'none';
+            }
+        }
     </script>
-    <audio id="backgroundMusic" src="yourmusicfile.mp3" loop></audio>
 </body>
 </html>
