@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,94 +5,145 @@
     <title>Random Task Generator</title>
     <style>
         body {
+            font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-        }
-        .container {
+            background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+            color: white;
             text-align: center;
+            position: relative;
+        }
+        #pointsDisplay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #000;
+        }
+        #settingsButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #settingsPopup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            color: black;
             padding: 20px;
             border-radius: 10px;
-            background-color: #ffffff;
+            display: none;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .title {
-            font-size: 48px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #333;
+        #settingsPopup.show {
+            display: block;
         }
-        .task {
-            font-size: 24px;
-            margin: 20px 0;
+        #closeSettings {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+        #infoButton {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
             padding: 10px;
-            border: 1px solid #ccc;
+            border: none;
             border-radius: 5px;
+            cursor: pointer;
+        }
+        #infoPopup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            color: black;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #infoPopup.show {
+            display: block;
+        }
+        #closeInfo {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
         }
         .button {
-            font-size: 18px;
             padding: 10px 20px;
             margin: 10px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            background-color: rgba(255, 255, 255, 0.2);
         }
-        .get-task-button {
-            background-color: #007bff;
-            color: white;
+        #generateTaskButton {
+            background-color: rgba(255, 255, 255, 0.2);
         }
-        .complete-task-button {
-            background-color: #28a745;
-            color: white;
+        #completeTaskButton {
+            background-color: rgba(255, 255, 255, 0.2);
+            display: none;
         }
-        .points-display {
-            font-size: 20px;
-            margin-top: 10px;
+        #taskDisplay {
+            margin-top: 20px;
         }
-        .top-left-label {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-size: 14px;
-            color: #555;
-        }
-        .music-settings {
+        #timerDisplay {
             margin-top: 10px;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="top-left-label">Made by @HarshHelium</div>
-        <div class="title">Random Task Generator</div>
-        <div class="task" id="task"></div>
-        <button class="button get-task-button" id="getTaskBtn">Get a Random Task</button>
-        <button class="button complete-task-button" id="completeTaskBtn" disabled>Complete Task (<span id="timer">60</span>s)</button>
-        <div class="points-display" id="pointsDisplay">Points: 0</div>
-        <div class="music-settings">
-            <label for="backgroundMusic">Background Music:</label>
-            <input type="checkbox" id="backgroundMusic">
-        </div>
+<body onload="initialize()">
+    <div id="pointsDisplay">Made by @HarshHelium<br>Points: <span id="points">0</span></div>
+    <button id="settingsButton" class="button" onclick="showSettings()">Settings</button>
+    <div>
+        <h1>Random Task Generator</h1>
+        <button id="generateTaskButton" class="button" onclick="generateTask()">Get a Random Task</button>
+        <button id="completeTaskButton" class="button" onclick="completeTask()">Complete Task</button>
+        <div id="taskDisplay"></div>
+        <div id="timerDisplay"></div>
     </div>
-
+    <button id="infoButton" class="button" onclick="showInfo()">Info</button>
+    <div id="infoPopup">
+        <div id="closeInfo" onclick="closeInfo()">X</div>
+        <p>Welcome to the Random Task Generator!</p>
+        <p>Click "Get a Random Task" to receive a task.</p>
+        <p>Complete the task and click "Complete Task" to earn points.</p>
+        <p>Each dificulty of task has a diffrent timer till you can complete it.</p>
+        <p>Points are displayed at the top left of the screen.</p>
+        <p>Made by HarshHelium</p>
+    </div>
+    <div id="settingsPopup">
+        <div id="closeSettings" onclick="closeSettings()">X</div>
+        <p>Settings</p>
+        <label for="taskMode">Task Mode:</label>
+        <select id="taskMode" onchange="setTaskMode(this.value)">
+            <option value="all">All</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+            <option value="impossible">Impossible</option>
+        </select>
+    </div>
+    <div id="particles-js"></div>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const taskElement = document.getElementById('task');
-            const getTaskBtn = document.getElementById('getTaskBtn');
-            const completeTaskBtn = document.getElementById('completeTaskBtn');
-            const timerElement = document.getElementById('timer');
-            const pointsDisplay = document.getElementById('pointsDisplay');
-            const backgroundMusicCheckbox = document.getElementById('backgroundMusic');
-            const topLeftLabel = document.querySelector('.top-left-label');
-            let timer;
-            let points = 0;
-            let canGetNewTask = true;
-
-            const tasks = [
+        const tasks = [
             { task: "Go outside", difficulty: "easy" },
             { task: "Do 10 jumping jacks", difficulty: "easy" },
             { task: "Find someone named Joe", difficulty: "medium" },
@@ -263,121 +313,193 @@
             { task: "Explore an abandoned location", difficulty: "hard" },
             { task: "Have a romantic sunset with somone you love", difficulty: "hard" },
             { task: "Find find true love", difficulty: "impossible" }
-            ];
+        ];
+        let points = 0;
+        let timerInterval;
+        let selectedTaskMode = 'all';
 
-            function getRandomTask() {
-                return tasks[Math.floor(Math.random() * tasks.length)];
-            }
-
-            function startTimer(duration, display) {
-                let timer = duration, minutes, seconds;
-                let interval = setInterval(function () {
-                    minutes = parseInt(timer / 60, 10);
-                    seconds = parseInt(timer % 60, 10);
-
-                    seconds = seconds < 10 ? "0" + seconds : seconds;
-
-                    display.textContent = seconds;
-
-                    if (--timer < 0) {
-                        clearInterval(interval);
-                        completeTaskBtn.disabled = false;
-                        display.textContent = "0";
+        function initialize() {
+            loadPoints();
+            showInfoIfFirstVisit();
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 50,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#ffffff"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                        "polygon": {
+                            "nb_sides": 5
+                        },
+                        "image": {
+                            "src": "img/github.svg",
+                            "width": 100,
+                            "height": 100
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.5,
+                        "random": true,
+                        "anim": {
+                            "enable": false,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": false,
+                            "speed": 40,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#ffffff",
+                        "opacity": 0.4,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 2,
+                        "direction": "none",
+                        "random": false,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": false,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
                     }
-                }, 1000);
-                return interval;
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "repulse"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "repulse": {
+                            "distance": 100,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
+        }
+
+        function showSettings() {
+            document.getElementById('settingsPopup').classList.add('show');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsPopup').classList.remove('show');
+        }
+
+        function setTaskMode(mode) {
+            selectedTaskMode = mode;
+        }
+
+        function showInfo() {
+            document.getElementById('infoPopup').classList.add('show');
+        }
+
+        function closeInfo() {
+            document.getElementById('infoPopup').classList.remove('show');
+        }
+
+        function showInfoIfFirstVisit() {
+            if (!localStorage.getItem('visited')) {
+                showInfo();
+                localStorage.setItem('visited', 'true');
             }
+        }
 
-            getTaskBtn.addEventListener('click', function() {
-                if (!canGetNewTask) return;
+        function loadPoints() {
+            points = localStorage.getItem('points') ? parseInt(localStorage.getItem('points'), 10) : 0;
+            document.getElementById('points').innerText = points;
+        }
 
-                const task = getRandomTask();
-                taskElement.textContent = task.text;
-                taskElement.style.borderColor = task.difficulty === 'easy' ? 'green' : task.difficulty === 'medium' ? 'orange' : 'red';
-                completeTaskBtn.disabled = true;
-                clearInterval(timer);
-                timer = startTimer(60, timerElement);
-                canGetNewTask = false;
-                setTimeout(() => { canGetNewTask = true; }, 3600000); // 1 hour cooldown for new task
-            });
+        function savePoints() {
+            localStorage.setItem('points', points);
+        }
 
-            completeTaskBtn.addEventListener('click', function() {
-                if (!completeTaskBtn.disabled) {
-                    points += 10;
-                    pointsDisplay.textContent = `Points: ${points}`;
-                    taskElement.textContent = '';
-                    completeTaskBtn.disabled = true;
-                }
-            });
+        function generateTask() {
+            const filteredTasks = tasks.filter(task => selectedTaskMode === 'all' || task.difficulty === selectedTaskMode);
+            const randomTask = filteredTasks[Math.floor(Math.random() * filteredTasks.length)];
+            document.getElementById('taskDisplay').innerText = randomTask.task;
+            if (randomTask.difficulty === 'impossible') {
+                document.getElementById('timerDisplay').innerText = 'Your whole life';
+            } else {
+                startTimer(randomTask.difficulty);
+            }
+            document.getElementById('completeTaskButton').style.display = 'inline-block';
+        }
 
-            backgroundMusicCheckbox.addEventListener('change', function() {
-                if (this.checked) {
-                    // Add code to start playing music
+        function startTimer(difficulty) {
+            clearInterval(timerInterval);
+            let time = 0;
+            switch (difficulty) {
+                case 'easy':
+                    time = 5 * 60;
+                    break;
+                case 'medium':
+                    time = 10 * 60;
+                    break;
+                case 'hard':
+                    time = 30 * 60;
+                    break;
+            }
+            timerInterval = setInterval(() => {
+                if (time <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timerDisplay').innerText = 'You can complete the task now.';
                 } else {
-                    // Add code to stop playing music
+                    time--;
+                    document.getElementById('timerDisplay').innerText = Time until you can complete task: ${Math.floor(time / 60)}m ${time % 60}s;
                 }
-            });
+            }, 1000);
+        }
 
-            // Random background color on reload
-            document.body.style.backgroundColor = `#${Math.floor(Math.random()*16777215).toString(16)}`;
-
-            // Random particles effect
-            const particles = document.createElement('div');
-            particles.innerHTML = '<canvas id="particles"></canvas>';
-            document.body.appendChild(particles);
-
-            const canvas = document.getElementById('particles');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
-            const particlesArray = [];
-            const numberOfParticles = 100;
-
-            class Particle {
-                constructor() {
-                    this.x = Math.random() * canvas.width;
-                    this.y = Math.random() * canvas.height;
-                    this.size = Math.random() * 5;
-                    this.speedX = Math.random() * 3 - 1.5;
-                    this.speedY = Math.random() * 3 - 1.5;
-                }
-                update() {
-                    this.x += this.speedX;
-                    this.y += this.speedY;
-                    if (this.size > 0.2) this.size -= 0.1;
-                }
-                draw() {
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.closePath();
-                    ctx.fill();
-                }
+        function completeTask() {
+            if (document.getElementById('timerDisplay').innerText.includes('You can complete the task now')) {
+                points++;
+                savePoints();
+                document.getElementById('points').innerText = points;
+                document.getElementById('taskDisplay').innerText = '';
+                document.getElementById('timerDisplay').innerText = '';
+                document.getElementById('completeTaskButton').style.display = 'none';
             }
-
-            function init() {
-                for (let i = 0; i < numberOfParticles; i++) {
-                    particlesArray.push(new Particle());
-                }
-            }
-
-            function handleParticles() {
-                for (let i = 0; i < particlesArray.length; i++) {
-                    particlesArray[i].update();
-                    particlesArray[i].draw();
-                }
-            }
-
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                handleParticles();
-                requestAnimationFrame(animate);
-            }
-
-            init();
-            animate();
-        });
+        }
     </script>
 </body>
 </html>
