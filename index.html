@@ -321,7 +321,7 @@
             { task: "Find an abandoned building", difficulty: "medium" },
             { task: "Explore an abandoned location", difficulty: "hard" },
             { task: "Have a romantic sunset with somone you love", difficulty: "hard" },
-            { description: "Climb Mount Everest", difficulty: "impossible" }
+            { task: "Find find true love", difficulty: "impossible" }
         ];
 
         const difficultyTimers = {
@@ -421,7 +421,7 @@
 
         function setVolume(value) {
             const music = document.getElementById('backgroundMusic');
-            music.volume = value / 100;
+            music.volume = value / 100; // Set volume based on slider value
         }
 
         function generateTask() {
