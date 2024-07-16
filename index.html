@@ -141,6 +141,9 @@
             <option value="hard">Hard</option>
             <option value="impossible">Impossible</option>
         </select>
+        <br><br>
+        <label for="volumeSlider">Music Volume:</label>
+        <input type="range" id="volumeSlider" min="1" max="50" value="10" oninput="setVolume(this.value)">
     </div>
     <div id="particles-js"></div>
     <audio id="backgroundMusic" loop>
@@ -416,13 +419,24 @@
             taskMode = mode;
         }
 
+        function setVolume(value) {
+            const music = document.getElementById('backgroundMusic');
+            music.volume = value / 100;
+        }
+
         function generateTask() {
             if (canGenerateTask) {
-                const filteredTasks = taskMode === 'all' ? tasks : tasks.filter(t => t.difficulty === taskMode);
+                const filteredTasks = taskMode === 'all' ? tasks : tasks.filter(task => task.difficulty === taskMode);
+                if (filteredTasks.length === 0) {
+                    alert(`No tasks available for the selected mode: ${taskMode}`);
+                    return;
+                }
+
                 const randomIndex = Math.floor(Math.random() * filteredTasks.length);
                 task = filteredTasks[randomIndex];
-                document.getElementById('taskDisplay').textContent = task.task;
-                document.getElementById('completeTaskButton').style.display = 'inline-block';
+
+                document.getElementById('taskDisplay').textContent = task.description;
+                document.getElementById('completeTaskButton').style.display = task.difficulty === 'impossible' ? 'none' : 'inline-block';
 
                 if (task.difficulty !== 'impossible') {
                     timer = Date.now() + difficultyTimers[task.difficulty];
